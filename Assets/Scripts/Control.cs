@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor.SearchService;
 using UnityEngine;
 
 public class Control : MonoBehaviour, IEntity
@@ -8,16 +9,22 @@ public class Control : MonoBehaviour, IEntity
     Vector3 m_inputDir;
     private float m_height;
     private float m_radius;
-    [SerializeField] private bool m_isGround;
+    [SerializeField] public bool m_isGround;
     public float speedModifier;
     public float jumpModifier;
     private Vector3 m_velocity;
     private Vector3 m_groundNormal;
     public float stepOffset;
     public float skin;
+    public static Control instance;
+    [SerializeField] public Transform playerInputSpace;
     // Start is called before the first frame update
     void Start()
     {
+        if (instance == null)
+            instance = this;
+        else
+            Destroy(gameObject);
         m_height = GetComponent<CapsuleCollider>().height;
         m_radius = GetComponent<CapsuleCollider>().radius;
         speedModifier = speedModifier > 0 ? speedModifier : 5;
@@ -42,6 +49,20 @@ void Update()
         m_inputDir.x = x;
         m_inputDir.z = z;
         m_inputDir.y = 0;
+        if(playerInputSpace)
+        {
+            Vector3 forward = playerInputSpace.forward;
+            forward.y = 0;
+            forward.Normalize();
+            Vector3 right = playerInputSpace.right;
+            right.y = 0;
+            right.Normalize();
+            m_inputDir = forward * m_inputDir.z + right * m_inputDir.x;
+        }
+        else
+        {
+            m_inputDir = new Vector3(m_inputDir.x, 0, m_inputDir.z);
+        }
 
         if(m_isGround)
         {

@@ -23,8 +23,16 @@ public class Walk : State
     public override void StateUpedate()
     {
         Debug.Log("Walk状态更新");
-        // if(GoJump()) return;
-        // Move();
+        if(Control.instance.m_isGround == false)
+        {
+            sm.SwitchState("Fall");
+            return;
+        }
+        else
+        {
+            if(GoJump()) return;
+            if(NotMove()) return;
+        }
     }
     public override void StateFixedUpedate()
     {
@@ -38,6 +46,19 @@ public class Walk : State
             return true;
         }
         return false;
+    }
+
+    private bool NotMove()
+    {
+        float horizontalInput = Input.GetAxis("Horizontal");
+        if(horizontalInput < float.Epsilon)
+        {
+            sm.SwitchState("Idle");
+            // Vector3 movement = new Vector3(horizontalInput, 0, 0);
+            // entityTransform.position += movement * velocity * Time.deltaTime;
+            return true;
+        }
+        else return false;
     }
     // private bool Move()
     // {

@@ -23,8 +23,16 @@ public class Idle : State
     public override void StateUpedate()
     {
         Debug.Log("Idle状态更新");
-        if(GoJump()) return;
-        Move();
+        if(Control.instance.m_isGround == false)
+        {
+            sm.SwitchState("Fall");
+            return;
+        }
+        else
+        {
+            if(GoJump()) return;
+            if(Move()) return;
+        }
     }
     public override void StateFixedUpedate()
     {
